@@ -1,0 +1,559 @@
+<!DOCTYPE HTML> <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ZaidAI — AI Assistant</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:#fff;
+    color:#202124;
+    height:100vh;
+    overflow:hidden;
+}
+.app{display:flex;height:100vh}
+
+/* SIDEBAR */
+.sidebar{
+    width:270px;
+    background:#f7f8fc;
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    transition:.3s;
+}
+.logo{
+    font-size:24px;
+    font-weight:700;
+    margin:8px 10px 28px;
+    background:linear-gradient(90deg,#4285f4,#9b51e0,#e94235);
+    -webkit-background-clip:text;
+    color:transparent;
+}
+.newchat{
+    border:0;
+    padding:13px 17px;
+    border-radius:25px;
+    background:#e8f0fe;
+    cursor:pointer;
+    font-size:15px;
+    text-align:left;
+}
+.menu{
+    margin-top:25px;
+    flex:1;
+}
+.menu button{
+    width:100%;
+    border:0;
+    background:transparent;
+    padding:12px;
+    text-align:left;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:14px;
+}
+.menu button:hover{background:#e8eaed}
+
+.bottom button{
+    width:100%;
+    border:0;
+    background:transparent;
+    padding:12px;
+    text-align:left;
+    cursor:pointer;
+}
+
+/* MAIN */
+.main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+}
+.topbar{
+    height:65px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 22px;
+    border-bottom:1px solid #eee;
+}
+.model{
+    font-size:18px;
+    font-weight:600;
+}
+.top-actions button{
+    border:0;
+    background:transparent;
+    font-size:21px;
+    cursor:pointer;
+    margin-left:14px;
+}
+
+/* CHAT */
+.chat{
+    flex:1;
+    overflow-y:auto;
+    padding:35px 8%;
+}
+.welcome{
+    max-width:800px;
+    margin:70px auto 30px;
+}
+.welcome h1{
+    font-size:48px;
+    background:linear-gradient(90deg,#4285f4,#9b51e0,#e94235);
+    -webkit-background-clip:text;
+    color:transparent;
+}
+.welcome p{
+    margin-top:12px;
+    color:#666;
+    font-size:18px;
+}
+.cards{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+    margin-top:35px;
+}
+.card{
+    padding:18px;
+    border:1px solid #ddd;
+    border-radius:16px;
+    cursor:pointer;
+    transition:.2s;
+}
+.card:hover{
+    background:#f8f9fa;
+    transform:translateY(-2px);
+}
+.card b{display:block;margin-bottom:7px}
+.card span{color:#666;font-size:13px}
+
+.message{
+    max-width:850px;
+    margin:0 auto 25px;
+    display:flex;
+    gap:13px;
+}
+.avatar{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    background:#eee;
+}
+.message.user .avatar{background:#4285f4;color:#fff}
+.bubble{
+    line-height:1.65;
+    white-space:pre-wrap;
+    max-width:760px;
+}
+.actions{
+    margin-top:8px;
+}
+.actions button{
+    border:0;
+    background:transparent;
+    cursor:pointer;
+    margin-right:8px;
+    opacity:.65;
+}
+
+/* COMPOSER */
+.composer-area{
+    padding:15px 7% 20px;
+}
+.composer{
+    max-width:900px;
+    margin:auto;
+    border:1px solid #d5d8df;
+    border-radius:27px;
+    padding:8px 10px 8px 18px;
+    display:flex;
+    align-items:center;
+    box-shadow:0 2px 10px #0000000b;
+}
+.composer input{
+    flex:1;
+    border:0;
+    outline:0;
+    font-size:15px;
+    padding:10px;
+}
+.icon{
+    border:0;
+    background:transparent;
+    font-size:20px;
+    cursor:pointer;
+    padding:8px;
+}
+.send{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    border:0;
+    background:#1a73e8;
+    color:#fff;
+    cursor:pointer;
+}
+.disclaimer{
+    text-align:center;
+    font-size:11px;
+    color:#777;
+    margin-top:9px;
+}
+
+/* MOBILE */
+.mobile-menu{display:none}
+
+@media(max-width:700px){
+    .sidebar{
+        position:fixed;
+        left:-280px;
+        top:0;
+        bottom:0;
+        z-index:10;
+    }
+    .sidebar.open{left:0}
+    .mobile-menu{display:inline-block}
+    .welcome{margin:45px 10px 25px}
+    .welcome h1{font-size:36px}
+    .cards{grid-template-columns:1fr}
+    .chat{padding:20px 15px}
+    .composer-area{padding:10px}
+}
+
+/* DARK */
+.dark body{background:#131314;color:#eee}
+body.dark{
+    background:#131314;
+    color:#eee;
+}
+body.dark .sidebar{background:#1e1f20}
+body.dark .topbar{border-color:#333}
+body.dark .composer{border-color:#444;background:#1e1f20}
+body.dark .composer input{
+    background:transparent;
+    color:#fff;
+}
+body.dark .card{
+    border-color:#444;
+}
+body.dark .card:hover{background:#202124}
+body.dark .card span,
+body.dark .welcome p{color:#aaa}
+body.dark .newchat{background:#303134;color:#fff}
+body.dark .menu button,
+body.dark .bottom button{color:#eee}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<aside class="sidebar" id="sidebar">
+    <div class="logo">ZaidAI</div>
+
+    <button class="newchat" onclick="newChat()">＋ New chat</button>
+
+    <div class="menu">
+        <button onclick="focusInput()">🔍 Search</button>
+        <button onclick="alert('Chat history coming here')">💬 Recent chats</button>
+        <button onclick="alert('File upload UI ready')">📁 Files</button>
+        <button onclick="alert('Image generation UI ready')">🎨 Create image</button>
+    </div>
+
+    <div class="bottom">
+        <button onclick="toggleTheme()">🌙 Theme</button>
+        <button onclick="clearChat()">🗑 Clear chat</button>
+    </div>
+</aside>
+
+<main class="main">
+
+<header class="topbar">
+    <button class="icon mobile-menu" onclick="toggleSidebar()">☰</button>
+
+    <div class="model">ZaidAI</div>
+
+    <div class="top-actions">
+        <button onclick="toggleTheme()">☼</button>
+        <button onclick="alert('Settings')">⚙</button>
+    </div>
+</header>
+
+<section class="chat" id="chat">
+
+    <div class="welcome" id="welcome">
+        <h1>Hello, Zaid 👋</h1>
+        <p>How can I help you today?</p>
+
+        <div class="cards">
+
+            <div class="card"
+                 onclick="usePrompt('Create a professional photo prompt')">
+                <b>📸 Create a photo prompt</b>
+                <span>Generate a detailed cinematic image prompt.</span>
+            </div>
+
+            <div class="card"
+                 onclick="usePrompt('Write HTML code for a modern website')">
+                <b>💻 Write code</b>
+                <span>Create HTML, CSS and JavaScript.</span>
+            </div>
+
+            <div class="card"
+                 onclick="usePrompt('Give me 10 YouTube video ideas')">
+                <b>💡 Brainstorm ideas</b>
+                <span>Generate creative content ideas.</span>
+            </div>
+
+            <div class="card"
+                 onclick="usePrompt('Explain artificial intelligence simply')">
+                <b>🧠 Explain something</b>
+                <span>Get simple explanations for complex topics.</span>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+<div class="composer-area">
+    <div class="composer">
+
+        <button class="icon" onclick="document.getElementById('file').click()">＋</button>
+        <input type="file" id="file" hidden>
+
+        <input
+            id="input"
+            type="text"
+            placeholder="Ask ZaidAI..."
+            onkeydown="if(event.key==='Enter') sendMessage()"
+        >
+
+        <button class="icon" onclick="voice()">🎤</button>
+
+        <button class="send" onclick="sendMessage()">➤</button>
+
+    </div>
+
+    <div class="disclaimer">
+        ZaidAI can make mistakes. Check important information.
+    </div>
+</div>
+
+</main>
+</div>
+
+<script>
+
+const input = document.getElementById("input");
+const chat = document.getElementById("chat");
+const welcome = document.getElementById("welcome");
+
+function focusInput(){
+    input.focus();
+}
+
+function toggleSidebar(){
+    document.getElementById("sidebar").classList.toggle("open");
+}
+
+function toggleTheme(){
+    document.body.classList.toggle("dark");
+
+    localStorage.setItem(
+        "theme",
+        document.body.classList.contains("dark") ? "dark" : "light"
+    );
+}
+
+if(localStorage.getItem("theme")==="dark"){
+    document.body.classList.add("dark");
+}
+
+function usePrompt(text){
+    input.value=text;
+    input.focus();
+}
+
+function addMessage(text,type){
+
+    const message=document.createElement("div");
+    message.className="message "+type;
+
+    const avatar=document.createElement("div");
+    avatar.className="avatar";
+    avatar.textContent=type==="user"?"U":"✦";
+
+    const content=document.createElement("div");
+    content.className="bubble";
+
+    content.textContent=text;
+
+    message.appendChild(avatar);
+    message.appendChild(content);
+
+    if(type==="assistant"){
+
+        const actions=document.createElement("div");
+        actions.className="actions";
+
+        actions.innerHTML=`
+            <button onclick="copyText(this)">📋</button>
+            <button>👍</button>
+            <button>👎</button>
+        `;
+
+        content.appendChild(actions);
+    }
+
+    chat.appendChild(message);
+    chat.scrollTop=chat.scrollHeight;
+}
+
+function copyText(button){
+
+    const text=button.parentElement.parentElement
+        .firstChild
+        .textContent;
+
+    navigator.clipboard.writeText(text);
+
+    button.textContent="✓";
+    setTimeout(()=>button.textContent="📋",1000);
+}
+
+function sendMessage(){
+
+    const text=input.value.trim();
+
+    if(!text)return;
+
+    welcome.style.display="none";
+
+    addMessage(text,"user");
+
+    input.value="";
+
+    const typing=document.createElement("div");
+    typing.className="message";
+    typing.id="typing";
+
+    typing.innerHTML=`
+        <div class="avatar">✦</div>
+        <div class="bubble">Thinking...</div>
+    `;
+
+    chat.appendChild(typing);
+    chat.scrollTop=chat.scrollHeight;
+
+    setTimeout(()=>{
+
+        typing.remove();
+
+        const reply=getDemoResponse(text);
+
+        addMessage(reply,"assistant");
+
+    },900);
+}
+
+function getDemoResponse(text){
+
+    const t=text.toLowerCase();
+
+    if(t.includes("photo") || t.includes("prompt")){
+
+        return `Ultra-realistic cinematic portrait, natural skin texture,
+soft golden-hour lighting, detailed environment,
+professional photography, shallow depth of field,
+85mm lens, realistic colors, highly detailed,
+sharp eyes, natural shadows, cinematic composition,
+photorealistic quality, 8K detail.`;
+    }
+
+    if(t.includes("html") || t.includes("code")){
+
+        return `I can help you create HTML, CSS and JavaScript.
+
+For a real AI coding assistant, connect this frontend
+to your backend API.`;
+    }
+
+    if(t.includes("hello") || t.includes("hi")){
+
+        return "Hello! 👋 I'm ZaidAI. How can I help you?";
+    }
+
+    return `I received your message:
+
+"${text}"
+
+This is currently a frontend demo. Connect a backend
+AI API to receive real AI-generated answers.`;
+}
+
+function newChat(){
+
+    chat.innerHTML="";
+
+    chat.appendChild(welcome);
+
+    welcome.style.display="block";
+
+    input.value="";
+    input.focus();
+}
+
+function clearChat(){
+    if(confirm("Clear this chat?")){
+        newChat();
+    }
+}
+
+function voice(){
+
+    if(!("webkitSpeechRecognition" in window)){
+        alert("Voice recognition is not supported in this browser.");
+        return;
+    }
+
+    const recognition=new webkitSpeechRecognition();
+
+    recognition.lang="hi-IN";
+
+    recognition.onresult=function(event){
+        input.value=event.results[0][0].transcript;
+    };
+
+    recognition.start();
+}
+
+</script>
+
+</body>
+</html>
+
+<html>
+
+<head>
+  <title>Untitled</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
